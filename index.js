@@ -101,7 +101,7 @@ const TabBar = ({ theme, activeCategory, onPress, width }) => {
   });
 };
 
-const EmojiCell = ({ emoji, colSize, ...other }) => (
+const EmojiCell = ({ emoji, colSize,size, ...other }) => (
   <TouchableOpacity
     activeOpacity={0.5}
     style={{
@@ -112,7 +112,7 @@ const EmojiCell = ({ emoji, colSize, ...other }) => (
     }}
     {...other}
   >
-    <Text style={{ color: "#FFFFFF", fontSize: colSize - 12 }}>
+    <Text style={{ color: "#FFFFFF", fontSize:size|| colSize - 12 }}>
       {charFromEmojiObject(emoji)}
     </Text>
   </TouchableOpacity>
@@ -194,6 +194,7 @@ export default class EmojiSelector extends Component {
     <EmojiCell
       key={item.key}
       emoji={item.emoji}
+      size={this.props.size}
       onPress={() => this.handleEmojiSelect(item.emoji)}
       colSize={this.state.colSize}
     />
