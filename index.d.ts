@@ -36,6 +36,8 @@ declare module "react-native-emoji-selector" {
     size?: number
     clearButtonMode?: 'never' | 'while-editing' | 'unless-editing' | 'always' | undefined;
     searchTextInputStyle?: StyleProp<TextStyle>
+    excludedEmojies?: [string]
+    excludedCategories?: [string]
   }
 
   const EmojiSelector: React.ComponentType<EmojiSelectorProps>;
