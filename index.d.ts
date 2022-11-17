@@ -1,6 +1,6 @@
 declare module "react-native-emoji-selector" {
   import * as React from "react";
-
+  import { StyleProp, TextStyle } from "react-native";
   /**
    * Categories
    * The package itself exports a dictionary of objects, however
@@ -32,8 +32,10 @@ declare module "react-native-emoji-selector" {
     showSectionTitles?: boolean;
     category?: Categories;
     columns?: number;
-    shouldInclude?: (e: any)=>boolean;
-    size?:number
+    shouldInclude?: (e: any) => boolean;
+    size?: number
+    clearButtonMode?: 'never' | 'while-editing' | 'unless-editing' | 'always' | undefined;
+    searchTextInputStyle?: StyleProp<TextStyle>
   }
 
   const EmojiSelector: React.ComponentType<EmojiSelectorProps>;

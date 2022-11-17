@@ -101,7 +101,7 @@ const TabBar = ({ theme, activeCategory, onPress, width }) => {
   });
 };
 
-const EmojiCell = ({ emoji, colSize,size, ...other }) => (
+const EmojiCell = ({ emoji, colSize, size, ...other }) => (
   <TouchableOpacity
     activeOpacity={0.5}
     style={{
@@ -112,7 +112,7 @@ const EmojiCell = ({ emoji, colSize,size, ...other }) => (
     }}
     {...other}
   >
-    <Text style={{ color: "#FFFFFF", fontSize:size|| colSize - 12 }}>
+    <Text style={{ color: "#FFFFFF", fontSize: size || colSize - 12 }}>
       {charFromEmojiObject(emoji)}
     </Text>
   </TouchableOpacity>
@@ -202,8 +202,8 @@ export default class EmojiSelector extends Component {
 
   returnSectionData() {
     const { history, emojiList, searchQuery, category } = this.state;
-    let emojiData = (function() {
-        if (category === Categories.all && searchQuery === "") {
+    let emojiData = (function () {
+      if (category === Categories.all && searchQuery === "") {
         //TODO: OPTIMIZE THIS
         let largeList = [];
         categoryKeys.forEach(c => {
@@ -283,6 +283,8 @@ export default class EmojiSelector extends Component {
       showSearchBar,
       showSectionTitles,
       showTabs,
+      searchTextInputStyle,
+      clearButtonMode,
       ...other
     } = this.props;
 
@@ -291,9 +293,9 @@ export default class EmojiSelector extends Component {
     const Searchbar = (
       <View style={styles.searchbar_container}>
         <TextInput
-          style={styles.search}
+          style={searchTextInputStyle || styles.search}
           placeholder={placeholder}
-          clearButtonMode="always"
+          clearButtonMode={clearButtonMode || "always"}
           returnKeyType="done"
           autoCorrect={false}
           underlineColorAndroid={theme}
