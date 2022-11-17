@@ -62,16 +62,17 @@ export const Categories = {
 const charFromUtf16 = utf16 =>
   String.fromCodePoint(...utf16.split("-").map(u => "0x" + u));
 export const charFromEmojiObject = obj => charFromUtf16(obj.unified);
-const filteredEmojis = emoji.filter(e => !e["obsoleted_by"]);
-const emojiByCategory = category =>
-  filteredEmojis.filter(e => e.category === category);
+const filteredEmojis = (values) => emoji.filter(e => !e["obsoleted_by"] && !(values || []).includes(charFromEmojiObject(e)));
+const emojiByCategory = (category, excludedEmojies) =>
+  filteredEmojis(excludedEmojies).filter(e => e.category === category);
 const sortEmoji = list => list.sort((a, b) => a.sort_order - b.sort_order);
 const categoryKeys = Object.keys(Categories);
 
-const TabBar = ({ theme, activeCategory, onPress, width }) => {
-  const tabSize = width / categoryKeys.length;
+const TabBar = ({ theme, activeCategory, onPress, width, excludedCategories }) => {
+  const newCategoryKeys = categoryKeys.filter(item => !(excludedCategories || []).includes(item));
+  const tabSize = width / newCategoryKeys.length;
 
-  return categoryKeys.map(c => {
+  return newCategoryKeys.map(c => {
     const category = Categories[c];
     if (c !== "all")
       return (
@@ -202,6 +203,7 @@ export default class EmojiSelector extends Component {
 
   returnSectionData() {
     const { history, emojiList, searchQuery, category } = this.state;
+    const { excludedCategories } = this.props;
     let emojiData = (function () {
       if (category === Categories.all && searchQuery === "") {
         //TODO: OPTIMIZE THIS
@@ -210,7 +212,7 @@ export default class EmojiSelector extends Component {
           const name = Categories[c].name;
           const list =
             name === Categories.history.name ? history : emojiList[name];
-          if (c !== "all" && c !== "history") largeList = largeList.concat(list);
+          if (c !== "all" && c !== "history" && !(excludedCategories || []).includes(c)) largeList = largeList.concat(list);
         });
 
         return largeList.map(emoji => ({ key: emoji.unified, emoji }));
@@ -242,7 +244,7 @@ export default class EmojiSelector extends Component {
     let emojiList = {};
     categoryKeys.forEach(c => {
       let name = Categories[c].name;
-      emojiList[name] = sortEmoji(emojiByCategory(name));
+      emojiList[name] = sortEmoji(emojiByCategory(name, this.props.excludedEmojies));
     });
 
     this.setState(
@@ -298,7 +300,7 @@ export default class EmojiSelector extends Component {
           clearButtonMode={clearButtonMode || "always"}
           returnKeyType="done"
           autoCorrect={false}
-          underlineColorAndroid={theme}
+          // underlineColorAndroid={theme}
           value={searchQuery}
           onChangeText={this.handleSearch}
         />
