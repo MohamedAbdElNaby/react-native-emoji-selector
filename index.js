@@ -7,10 +7,12 @@ import {
   TextInput,
   Platform,
   ActivityIndicator,
-  AsyncStorage,
   FlatList
 } from "react-native";
+import AsyncStorage from '@react-native-community/async-storage';
+
 import emoji from "emoji-datasource";
+
 
 export const Categories = {
   all: {
@@ -28,10 +30,6 @@ export const Categories = {
   people: {
     symbol: "🧑",
     name: "People & Body"
-  },
-  nature: {
-    symbol: "🦄",
-    name: "Animals & Nature"
   },
   food: {
     symbol: "🍔",
@@ -52,10 +50,6 @@ export const Categories = {
   symbols: {
     symbol: "🔣",
     name: "Symbols"
-  },
-  flags: {
-    symbol: "🏳️",
-    name: "Flags"
   }
 };
 
@@ -202,8 +196,9 @@ export default class EmojiSelector extends Component {
   );
 
   returnSectionData() {
+  
     const { history, emojiList, searchQuery, category } = this.state;
-    const { excludedCategories } = this.props;
+    const { excludedCategories,excludedEmojies } = this.props;
     let emojiData = (function () {
       if (category === Categories.all && searchQuery === "") {
         //TODO: OPTIMIZE THIS
@@ -237,7 +232,9 @@ export default class EmojiSelector extends Component {
         return list.map(emoji => ({ key: emoji.unified, emoji }));
       }
     })()
-    return this.props.shouldInclude ? emojiData.filter(e => this.props.shouldInclude(e.emoji)) : emojiData
+    // alert(JSON.stringify(emojiData[0]));
+
+    return this.props.shouldInclude ? emojiData.filter(e => this.props.shouldInclude(e.emoji)).filter(l => !excludedEmojies.includes(charFromEmojiObject(l.emoji))) : emojiData.filter(l => !excludedEmojies.includes(charFromEmojiObject(l.emoji))) 
   }
 
   prerenderEmojis(callback) {
