@@ -9,12 +9,10 @@ import {
   ActivityIndicator,
   FlatList
 } from "react-native";
-
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
 import emoji from "emoji-datasource";
-
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
+​
+​
 export const Categories = {
   all: {
     symbol: null,
@@ -53,7 +51,7 @@ export const Categories = {
     name: "Symbols"
   }
 };
-
+​
 const charFromUtf16 = utf16 =>
   String.fromCodePoint(...utf16.split("-").map(u => "0x" + u));
 export const charFromEmojiObject = obj => charFromUtf16(obj.unified);
@@ -62,11 +60,11 @@ const emojiByCategory = (category, excludedEmojies) =>
   filteredEmojis(excludedEmojies).filter(e => e.category === category);
 const sortEmoji = list => list.sort((a, b) => a.sort_order - b.sort_order);
 const categoryKeys = Object.keys(Categories);
-
+​
 const TabBar = ({ theme, activeCategory, onPress, width, excludedCategories }) => {
   const newCategoryKeys = categoryKeys.filter(item => !(excludedCategories || []).includes(item));
   const tabSize = width / newCategoryKeys.length;
-
+​
   return newCategoryKeys.map(c => {
     const category = Categories[c];
     if (c !== "all")
@@ -96,7 +94,7 @@ const TabBar = ({ theme, activeCategory, onPress, width, excludedCategories }) =
       );
   });
 };
-
+​
 const EmojiCell = ({ emoji, colSize, size, ...other }) => (
   <TouchableOpacity
     activeOpacity={0.5}
@@ -113,7 +111,7 @@ const EmojiCell = ({ emoji, colSize, size, ...other }) => (
     </Text>
   </TouchableOpacity>
 );
-
+​
 const storage_key = "@react-native-emoji-selector:HISTORY";
 export default class EmojiSelector extends Component {
   state = {
@@ -125,7 +123,7 @@ export default class EmojiSelector extends Component {
     colSize: 0,
     width: 0
   };
-
+​
   //
   //  HANDLER METHODS
   //
@@ -139,21 +137,21 @@ export default class EmojiSelector extends Component {
       });
     }
   };
-
+​
   handleEmojiSelect = emoji => {
     if (this.props.showHistory) {
       this.addToHistoryAsync(emoji);
     }
     this.props.onEmojiSelected(charFromEmojiObject(emoji));
   };
-
+​
   handleSearch = searchQuery => {
     this.setState({ searchQuery });
   };
-
+​
   addToHistoryAsync = async emoji => {
     let history = await AsyncStorage.getItem(storage_key);
-
+​
     let value = [];
     if (!history) {
       // no history
@@ -168,13 +166,13 @@ export default class EmojiSelector extends Component {
         value = [record, ...json];
       }
     }
-
+​
     AsyncStorage.setItem(storage_key, JSON.stringify(value));
     this.setState({
       history: value
     });
   };
-
+​
   loadHistoryAsync = async () => {
     let result = await AsyncStorage.getItem(storage_key);
     if (result) {
@@ -182,7 +180,7 @@ export default class EmojiSelector extends Component {
       this.setState({ history });
     }
   };
-
+​
   //
   //  RENDER METHODS
   //
@@ -195,7 +193,7 @@ export default class EmojiSelector extends Component {
       colSize={this.state.colSize}
     />
   );
-
+​
   returnSectionData() {
   
     const { history, emojiList, searchQuery, category } = this.state;
@@ -210,7 +208,7 @@ export default class EmojiSelector extends Component {
             name === Categories.history.name ? history : emojiList[name];
           if (c !== "all" && c !== "history" && !(excludedCategories || []).includes(c)) largeList = largeList.concat(list);
         });
-
+​
         return largeList.map(emoji => ({ key: emoji.unified, emoji }));
       } else {
         let list;
@@ -230,21 +228,21 @@ export default class EmojiSelector extends Component {
         } else {
           list = emojiList[name];
         }
-        return list.map(emoji => ({ key: emoji.unified, emoji }));
+        return list.filter(l => l.category !== 'Flags' && l.category !== 'Animals & Nature'  ).map(emoji => ({ key: emoji.unified, emoji }));
       }
     })()
     // alert(JSON.stringify(emojiData[0]));
-
+​
     return this.props.shouldInclude ? emojiData.filter(e => this.props.shouldInclude(e.emoji)).filter(l => !excludedEmojies.includes(charFromEmojiObject(l.emoji))) : emojiData.filter(l => !excludedEmojies.includes(charFromEmojiObject(l.emoji))) 
   }
-
+​
   prerenderEmojis(callback) {
     let emojiList = {};
     categoryKeys.forEach(c => {
       let name = Categories[c].name;
       emojiList[name] = sortEmoji(emojiByCategory(name, this.props.excludedEmojies));
     });
-
+​
     this.setState(
       {
         emojiList,
@@ -253,7 +251,7 @@ export default class EmojiSelector extends Component {
       callback
     );
   }
-
+​
   handleLayout = ({ nativeEvent: { layout } }) => {
     this.setState({ width: layout.width }, () => {
       this.prerenderEmojis(() => {
@@ -261,19 +259,19 @@ export default class EmojiSelector extends Component {
       });
     });
   };
-
+​
   //
   //  LIFECYCLE METHODS
   //
   componentDidMount() {
     const { category, showHistory } = this.props;
     this.setState({ category });
-
+​
     if (showHistory) {
       this.loadHistoryAsync();
     }
   }
-
+​
   render() {
     const {
       theme,
@@ -287,9 +285,9 @@ export default class EmojiSelector extends Component {
       clearButtonMode,
       ...other
     } = this.props;
-
+​
     const { category, colSize, isReady, searchQuery } = this.state;
-
+​
     const Searchbar = (
       <View style={styles.searchbar_container}>
         <TextInput
@@ -304,9 +302,9 @@ export default class EmojiSelector extends Component {
         />
       </View>
     );
-
+​
     const title = searchQuery !== "" ? "Search Results" : category.name;
-
+​
     return (
       <View style={styles.frame} {...other} onLayout={this.handleLayout}>
         <View style={styles.tabBar}>
@@ -353,7 +351,7 @@ export default class EmojiSelector extends Component {
     );
   }
 }
-
+​
 EmojiSelector.defaultProps = {
   theme: "#007AFF",
   category: Categories.all,
@@ -364,7 +362,7 @@ EmojiSelector.defaultProps = {
   columns: 6,
   placeholder: "Search..."
 };
-
+​
 const styles = StyleSheet.create({
   frame: {
     flex: 1,
